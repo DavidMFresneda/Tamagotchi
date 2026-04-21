@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "Bash(mktemp -d)",
+      "Bash(cp -r 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/C/Users/culai/AppData/Local/Temp/tmp.qWOiRRz5oF/tamagotchi/src' 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/')",
+      "Bash(cp -r 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/C/Users/culai/AppData/Local/Temp/tmp.qWOiRRz5oF/tamagotchi/public' 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/')",
+      "Bash(cp 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/C/Users/culai/AppData/Local/Temp/tmp.qWOiRRz5oF/tamagotchi/index.html' 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/')",
+      "Bash(cp 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/C/Users/culai/AppData/Local/Temp/tmp.qWOiRRz5oF/tamagotchi/package.json' 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/')",
+      "Bash(cp 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/C/Users/culai/AppData/Local/Temp/tmp.qWOiRRz5oF/tamagotchi/tsconfig.json' 'C:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/')",
+      "Bash(npm install *)",
+      "Bash(mkdir -p 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/components' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/store' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/db' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/types')",
+      "Bash(cp 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/node_modules/sql.js/dist/sql-wasm.wasm' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/public/sql-wasm.wasm')",
+      "Bash(npm run *)",
+      "Read(//c/Users/culai/.claude/projects/c--Users-culai-OneDrive-Visual-Studio-Code-Tamagotchi/memory/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\culai\\.claude\\projects\\c--Users-culai-OneDrive-Visual-Studio-Code-Tamagotchi\\memory"
+    ]
+  }
+}
