@@ -78,3 +78,24 @@ src/db/          →  sql.js access (schema, queries, persistence)
 | Borders and layout | UI chrome (stat bars, panels, buttons) follows a blocky, pixel-grid-aligned style. Border radii are 0 or in whole pixel increments. |
 
 **Trade-off:** Pixel fonts reduce readability at small sizes. Keep all game UI text at a minimum of 8 px rendered size (which typically means the font-size is set to 8 px and the element is scaled up, or the font is used at 16 px+).
+
+---
+
+## ADR-008 — Responsive layout for mobile support
+
+**Decision:** The application must be fully usable on mobile devices (phones and tablets) as well as desktop browsers. This is a product constraint, not optional polish.
+
+**Reasoning:** The target audience (ages 10–14) is highly likely to open the game on a phone. A desktop-only layout would exclude a significant portion of the intended players.
+
+**Technical implications:**
+
+| Concern | Rule |
+| --- | --- |
+| Units | Use `rem`, `%`, `dvh`, `dvw` for all layout dimensions. No fixed `px` widths on containers. |
+| Minimum viewport | Design and test down to **360 px wide** (common entry-level Android phone). |
+| Touch targets | All interactive elements (buttons, links) must be at least **44 × 44 px** — the minimum comfortable tap size. |
+| Pixel art scaling | Sprites must remain crisp on all viewport sizes. Use integer CSS scale factors (`scale(2)`, `scale(3)`) and `image-rendering: pixelated`. Never stretch to a non-integer size. |
+| No horizontal scroll | The layout must not overflow horizontally on any supported viewport. |
+| Layout primitives | Use CSS Grid or `flexbox` for layout. Component widths adapt to available space via `max-width` and `width: 100%`. |
+
+**Trade-off:** Integer sprite scaling means the game area cannot fill arbitrary viewport widths smoothly. The sprite container will be centred within the available space rather than stretched, which is consistent with the pixel art aesthetic.

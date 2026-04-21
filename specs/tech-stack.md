@@ -82,6 +82,20 @@ npm run test:watch     # vitest (interactive watch mode)
 npm run test:coverage  # vitest run --coverage
 ```
 
+## Responsive design
+
+The application must be fully usable on both desktop browsers and mobile devices (phones and tablets). This is not optional polish — the target audience (ages 10–14) is likely to open the game on a phone.
+
+**Rules:**
+
+- Layout is defined in CSS using relative units (`rem`, `%`, `dvh`/`dvw`) and CSS Grid or `flexbox`. No fixed pixel widths on containers.
+- The minimum supported viewport is **360 px wide** (common entry-level Android phone).
+- Touch targets (buttons, interactive elements) are at least **44 × 44 px** — large enough for a finger tap.
+- The pixel art aesthetic is preserved on all screen sizes: sprites are scaled with `image-rendering: pixelated` and integer scale factors (`scale(2)`, `scale(3)`) so they never blur.
+- No horizontal scroll on any supported viewport.
+
+**Testing:** resize the browser window to 360 px wide before marking any UI phase complete. Mobile DevTools device emulation is sufficient.
+
 ## Build
 
 ```bash
