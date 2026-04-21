@@ -59,3 +59,22 @@ src/db/          →  sql.js access (schema, queries, persistence)
 ```
 
 **Reasoning:** Each layer has a single responsibility and can evolve or be replaced independently. Components do not query the database directly; they dispatch actions to the store. The store coordinates with the db layer when persistence is needed.
+
+---
+
+## ADR-007 — Pixel art as the visual style
+
+**Decision:** All graphics, sprites, fonts, and UI elements must follow a pixel art aesthetic. This is a product constraint defined in [specs/mission.md](specs/mission.md), not an implementation detail.
+
+**Technical implications:**
+
+| Concern | Rule |
+| --- | --- |
+| Image rendering | All `<img>` and canvas elements use `image-rendering: pixelated` in CSS to prevent the browser from smoothing scaled-up sprites. |
+| Asset resolution | Sprites are authored at low resolution (16×16 or 32×32 px) and displayed at 2×–4× scale via CSS `width`/`height`. Never scale up via asset export. |
+| Font | Use a bitmap/pixel font. *Press Start 2P* (Google Fonts) is the default choice — no system serif or sans-serif for game UI text. |
+| Animations | Use CSS `steps()` easing or sprite-sheet frame switching. Avoid `ease`, `ease-in-out`, or any interpolation that produces sub-pixel smoothing. |
+| SVG | Avoid smooth-curve SVG icons in game UI. If SVG is used, it must be drawn on a pixel grid (integer coordinates, no `stroke-linecap: round`). |
+| Borders and layout | UI chrome (stat bars, panels, buttons) follows a blocky, pixel-grid-aligned style. Border radii are 0 or in whole pixel increments. |
+
+**Trade-off:** Pixel fonts reduce readability at small sizes. Keep all game UI text at a minimum of 8 px rendered size (which typically means the font-size is set to 8 px and the element is scaled up, or the font is used at 16 px+).

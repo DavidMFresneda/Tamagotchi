@@ -12,7 +12,12 @@
       "Bash(mkdir -p 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/components' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/store' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/db' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/src/types')",
       "Bash(cp 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/node_modules/sql.js/dist/sql-wasm.wasm' 'c:/Users/culai/OneDrive/Visual Studio Code/Tamagotchi/public/sql-wasm.wasm')",
       "Bash(npm run *)",
-      "Read(//c/Users/culai/.claude/projects/c--Users-culai-OneDrive-Visual-Studio-Code-Tamagotchi/memory/**)"
+      "Read(//c/Users/culai/.claude/projects/c--Users-culai-OneDrive-Visual-Studio-Code-Tamagotchi/memory/**)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(bash -c 'f=$\\(jq -r \".tool_input.file_path // \\\\\"\\\\\"\"\\); case \"$f\" in */src/*|*\\\\\\\\src\\\\\\\\*|*ARCHITECTURE.md|*/specs/*.md|*\\\\\\\\specs\\\\\\\\*.md|*package.json\\) jq -n \"{\\\\\"systemMessage\\\\\": \\\\\"DOCS REMINDER: Check if README.md or ARCHITECTURE.md need updating.\\\\\", \\\\\"hookSpecificOutput\\\\\": {\\\\\"hookEventName\\\\\": \\\\\"PostToolUse\\\\\", \\\\\"additionalContext\\\\\": \\\\\"You just modified a source, spec, or config file. Check if README.md or ARCHITECTURE.md need updating to reflect this change.\\\\\"}}\" ;; esac')",
+      "Bash(node -e \"console.log\\('node ok'\\)\")",
+      "Bash(npm test *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\culai\\.claude\\projects\\c--Users-culai-OneDrive-Visual-Studio-Code-Tamagotchi\\memory"

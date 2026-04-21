@@ -30,18 +30,35 @@ A browser-based virtual pet game built with React. The pet has needs (hunger, ha
 ## Getting Started
 
 ```bash
+# 1. Install dependencies
 npm install
+
+# 2. Start the development server
 npm run dev
 ```
+
+The dev server starts at **<http://localhost:5173>** (Vite default). The port is printed in the terminal on startup; if 5173 is taken Vite will pick the next available one.
+
+## Building for production
+
+```bash
+# Type-check and bundle
+npm run build
+
+# Preview the production build locally (http://localhost:4173)
+npm run preview
+```
+
+`npm run build` runs `tsc -b` first — the build will fail if there are TypeScript errors. The output goes to `dist/`.
 
 ## Scripts
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Start the development server |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
+| `npm run dev` | Start dev server with HMR at <http://localhost:5173> |
+| `npm run build` | Type-check (`tsc -b`) then bundle with Vite into `dist/` |
+| `npm run preview` | Serve the production `dist/` locally at <http://localhost:4173> |
+| `npm run lint` | Run ESLint across all source files |
 
 ## Project Structure
 

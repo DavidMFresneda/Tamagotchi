@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"console.log(JSON.stringify({systemMessage:'CHANGELOG REMINDER: Update CHANGELOG.md with the changes from this session.',hookSpecificOutput:{hookEventName:'Stop',additionalContext:'Before finishing: update CHANGELOG.md with a dated entry summarising what changed in this session. Format: ## [YYYY-MM-DD] - brief title, then bullet points of changes.'}}))\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".claude/hooks/check-docs.js\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".claude/hooks/run-layer-tests.js\"",
+            "timeout": 60,
+            "asyncRewake": true,
+            "rewakeSummary": "Layer tests failed",
+            "rewakeMessage": "Vitest reported failures after file edit. Test output:"
+          }
+        ]
+      }
+    ]
+  }
+}

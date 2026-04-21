@@ -46,6 +46,42 @@ Save must be triggered after every mutation (care action, stat tick). A helper `
 
 The initial schema (applied on first boot) lives in `src/db/schema.ts`. It defines the `pets` table and any future tables. Migrations are additive SQL statements gated on a user-version pragma.
 
+## Testing
+
+**Framework:** [Vitest](https://vitest.dev/) — shares the Vite config pipeline, native TypeScript and ESM support, Jest-compatible API.
+
+**Libraries:**
+
+| Package | Role |
+| --- | --- |
+| `vitest` | Test runner and assertion library |
+| `@vitest/coverage-v8` | V8-native code coverage |
+| `jsdom` | DOM simulation for React component tests |
+| `@testing-library/react` | Renders components in jsdom, queries by role/text |
+| `@testing-library/user-event` | Simulates real user interactions |
+| `@testing-library/jest-dom` | Custom DOM matchers (`toBeInTheDocument`, etc.) |
+
+**Test file convention:** tests live in `__tests__/` directories co-located with the layer they test.
+
+```text
+src/store/__tests__/      # Business logic (Zustand) — no React, no DOM needed
+src/db/__tests__/         # Data layer — sql.js is mocked; WASM cannot run in Node
+src/components/__tests__/ # UI layer — jsdom + React Testing Library
+src/types/__tests__/      # Type-shape contracts; break intentionally when types change
+```
+
+**sql.js in tests:** the WASM binary cannot load in Node. All db-layer tests mock the `sql.js` module via `vi.mock('sql.js', ...)` using a `MockDatabase` class that stubs `run`, `exec`, `export`, and `close`.
+
+**Auto-run hook:** `.claude/hooks/run-layer-tests.js` is a PostToolUse hook that fires after every Write/Edit. It detects which layer was modified, checks that a `__tests__/` directory exists, then runs `npx vitest run --reporter=verbose src/<layer>` in the background. On failure the hook exits with code 2, which re-wakes Claude with the test output. Passing tests are silent.
+
+**Scripts:**
+
+```bash
+npm test               # vitest run (one-shot, used by the hook)
+npm run test:watch     # vitest (interactive watch mode)
+npm run test:coverage  # vitest run --coverage
+```
+
 ## Build
 
 ```bash
@@ -53,3 +89,5 @@ npm run dev      # Vite dev server with HMR
 npm run build    # tsc -b && vite build (type-check then bundle)
 npm run preview  # Serve the production dist/ locally
 ```
+
+Test files (`src/**/__tests__/`, `src/test/`) are excluded from `tsconfig.app.json` so they never affect the production build.
