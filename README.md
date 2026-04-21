@@ -54,6 +54,27 @@ src/
 └── assets/       # Static assets
 ```
 
+## Specification-Driven Development (SDD)
+
+This project follows a **specification-first** approach: before any feature is implemented, its intent, constraints, and acceptance criteria are written down in the `specs/` folder. Code is written to satisfy those specs, not the other way around.
+
+This keeps decisions explicit, makes the implementation order deliberate, and leaves a readable trail of *why* choices were made — which is especially valuable when revisiting the project after time away.
+
+### Specs folder
+
+```text
+specs/
+├── mission.md      # Purpose, audience, success criteria, and non-goals
+├── tech-stack.md   # What is used, where it lives, and integration details
+└── roadmap.md      # High-level implementation order in small, shippable phases
+```
+
+| File | Description |
+| --- | --- |
+| [specs/mission.md](specs/mission.md) | Defines *why* this project exists, who it is for, and what done looks like |
+| [specs/tech-stack.md](specs/tech-stack.md) | Documents each technology, its role, and non-obvious integration details (including the sql.js localStorage persistence strategy) |
+| [specs/roadmap.md](specs/roadmap.md) | Nine micro-phases (1–3 h each), ordered so every phase produces one working slice of the app |
+
 ## Architecture
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for architectural decisions and trade-offs.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for individual architectural decision records (ADRs).
