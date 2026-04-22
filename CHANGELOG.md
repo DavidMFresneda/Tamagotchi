@@ -4,6 +4,18 @@ All notable changes to this project are documented here, one entry per working s
 
 ---
 
+## [2026-04-22] - Phase 3 complete: Walking skeleton UI
+
+- `src/index.css` — replaced Vite template styles with pixel art baseline: Press Start 2P font, dark background, stat bar styles
+- `src/components/StatBar.tsx` — new component: label, ★ marker for special stats, fill bar scaled to `value/max`
+- `src/components/PetDisplay.tsx` — new component: reads store, renders pet name + three StatBar instances, null guard
+- `src/App.tsx` — temporary hardcoded seed pet (Pochi) via useEffect; mounts PetDisplay
+- `src/components/__tests__/StatBar.test.tsx` — covers label, fill width, star, .special class
+- `src/components/__tests__/PetDisplay.test.tsx` — covers name, stat labels, null render
+- `specs/roadmap.md` — Phase 3 marked as completed
+
+---
+
 ## [2026-04-22] - Phase 2 complete: Domain types and Zustand store skeleton
 
 - `src/types/index.ts` — added `Stat` interface; `Pet` now uses `Stat` objects for all three stats

@@ -30,15 +30,15 @@ The persistence foundation comes first so that every subsequent phase can write 
 
 ---
 
-## Phase 3 — Walking skeleton UI
+## Phase 3 — Walking skeleton UI ✅
 
 **Delivers:** The app renders the pet's name and three stat bars on screen, reading from the store. Special stats are visually marked.
 
-- Add a `<PetDisplay>` component: name, and one `<StatBar>` per stat.
-- `<StatBar>` receives the full `Stat` object; if `isSpecial` is true it renders a star icon and a distinct bar color.
-- The bar fill is `value / max * 100%` — so a special stat at 150/200 fills to 75%, same visual proportion as a normal stat at 75/100.
-- Mount in `App.tsx`.
-- No decay, no buttons, no persistence — just static data from the store's initial state.
+- [x] Add a `<PetDisplay>` component: name, and one `<StatBar>` per stat.
+- [x] `<StatBar>` receives the full `Stat` object; if `isSpecial` is true it renders a ★ icon and a gold bar color.
+- [x] The bar fill is `value / max * 100%` — so a special stat at 60/200 fills to 30%, same visual proportion as a normal stat at 60/100.
+- [x] Mount in `App.tsx` with a temporary hardcoded seed pet (removed in Phase 4).
+- [x] Press Start 2P pixel font and dark background applied globally.
 
 ---
 
