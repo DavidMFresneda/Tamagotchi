@@ -4,6 +4,21 @@ All notable changes to this project are documented here, one entry per working s
 
 ---
 
+## [2026-04-22] - Phase 4 complete: Random pet generation
+
+- `src/data/petNames.ts` — 20 quirky pixel-art pet names
+- `src/db/schema.ts` — USER_VERSION bumped to 2; pets table extended with `_max` and `_special` columns per stat
+- `src/db/database.ts` — migration gate: v1 DBs silently reset to v2 schema on load
+- `src/store/usePetStore.ts` — `generatePet()` implemented: random name, 10% special-stat roll, persists to DB + saveDb()
+- `src/App.tsx` — Phase 3 seed removed; replaced with async `boot()`: loads saved pet or calls `generatePet()`
+- `src/data/__tests__/petNames.test.ts` — count, type, uniqueness checks
+- `src/db/__tests__/database.test.ts` — updated mock with `vi.hoisted`; added migration gate test
+- `src/store/__tests__/usePetStore.test.ts` — `generatePet()` tests: name, max, value, isSpecial, state
+- `src/components/__tests__/App.test.tsx` — mocks database module to avoid WASM in tests
+- `specs/roadmap.md` — Phase 4 marked as completed
+
+---
+
 ## [2026-04-22] - Phase 3 complete: Walking skeleton UI
 
 - `src/index.css` — replaced Vite template styles with pixel art baseline: Press Start 2P font, dark background, stat bar styles

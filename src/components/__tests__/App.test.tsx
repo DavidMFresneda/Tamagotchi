@@ -1,3 +1,11 @@
+vi.mock('../../db/database', () => ({
+  getDatabase: vi.fn().mockResolvedValue({
+    exec: vi.fn().mockReturnValue([]),
+    run:  vi.fn(),
+  }),
+  saveDb: vi.fn(),
+}))
+
 import { render, screen } from '@testing-library/react'
 import App from '../../App'
 

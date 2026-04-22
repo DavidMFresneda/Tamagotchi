@@ -1,9 +1,17 @@
+const PRAGMA_V2 = [{ columns: ['user_version'], values: [[2]] }]
+const PRAGMA_V1 = [{ columns: ['user_version'], values: [[1]] }]
+
+const { mockRun, mockExec } = vi.hoisted(() => ({
+  mockRun:  vi.fn(),
+  mockExec: vi.fn(),
+}))
+
 vi.mock('sql.js', () => {
   class MockDatabase {
-    run = vi.fn()
-    exec = vi.fn()
+    run    = mockRun
+    exec   = mockExec
     export = vi.fn(() => new Uint8Array([1, 2, 3]))
-    close = vi.fn()
+    close  = vi.fn()
   }
   return { default: vi.fn().mockResolvedValue({ Database: MockDatabase }) }
 })
@@ -13,6 +21,7 @@ import { getDatabase, saveDb, _resetDatabase } from '../database'
 beforeEach(() => {
   _resetDatabase()
   vi.clearAllMocks()
+  mockExec.mockReturnValue(PRAGMA_V2)
   localStorage.clear()
 })
 
@@ -38,7 +47,7 @@ describe('getDatabase()', () => {
     expect(a).toBe(b)
   })
 
-  it('loads db from valid localStorage snapshot without applying schema', async () => {
+  it('loads db from valid localStorage snapshot and skips migration when up to date', async () => {
     const bytes = new Uint8Array([1, 2, 3])
     let binary = ''
     for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
@@ -47,6 +56,17 @@ describe('getDatabase()', () => {
     const db = await getDatabase()
     expect(db).toBeDefined()
     expect(db.run).not.toHaveBeenCalled()
+  })
+
+  it('runs migration when stored db has user_version < 2', async () => {
+    const bytes = new Uint8Array([1, 2, 3])
+    let binary = ''
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
+    localStorage.setItem('tamagotchi_db', btoa(binary))
+
+    mockExec.mockReturnValueOnce(PRAGMA_V1)
+    const db = await getDatabase()
+    expect(db.run).toHaveBeenCalled()
   })
 
   it('silently resets to a fresh db on corrupt localStorage data', async () => {

@@ -42,18 +42,15 @@ The persistence foundation comes first so that every subsequent phase can write 
 
 ---
 
-## Phase 4 — Random pet generation
+## Phase 4 — Random pet generation ✅
 
 **Delivers:** On first launch, a pet is created automatically and fully at random. No player input required.
 
-- Implement `generatePet()` in the store:
-  - Pick a name at random from a hardcoded list of ~20 names.
-  - For each of the three stats, roll `Math.random() < 0.1` to decide if it is special.
-  - A special stat gets `max: 200`; a normal stat gets `max: 100`. Initial `value` is set to `max` (pet starts healthy).
-- On app boot: check the DB for a saved pet row.
-  - If found: load it and hydrate the store.
-  - If not found: call `generatePet()`, persist the result to the DB, call `saveDb()`.
-- Update `src/db/schema.ts` to store `isSpecial` (boolean) and `max` for each stat alongside `value`.
+- [x] Implement `generatePet()` in the store: random name from `PET_NAMES`, 10% special-stat roll, `value = max`, persists to DB.
+- [x] On app boot: async `boot()` in `App.tsx` — loads from DB if pet exists, otherwise calls `generatePet()`.
+- [x] `src/db/schema.ts` upgraded to USER_VERSION 2: added `_max` and `_special` columns per stat.
+- [x] Migration gate in `database.ts`: silently resets v1 DBs to v2 schema on load.
+- [x] `src/data/petNames.ts`: 20 quirky pixel-art names.
 
 ---
 

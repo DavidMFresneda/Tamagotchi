@@ -16,6 +16,15 @@ export async function getDatabase(): Promise<Database> {
       const binary = atob(stored)
       const bytes = Uint8Array.from(binary, c => c.charCodeAt(0))
       db = new SQL.Database(bytes)
+
+      const [pragmaResult] = db.exec('PRAGMA user_version')
+      const version = (pragmaResult?.values?.[0]?.[0] as number) ?? 0
+      if (version < USER_VERSION) {
+        db.run('DROP TABLE IF EXISTS pets')
+        db.run(SCHEMA_SQL)
+        db.run(`PRAGMA user_version = ${USER_VERSION}`)
+      }
+
       return db
     } catch {
       localStorage.removeItem(STORAGE_KEY)
