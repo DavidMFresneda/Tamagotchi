@@ -1,11 +1,20 @@
 import { create } from 'zustand'
+import type { Pet } from '../types'
 
-interface PetState {
-  name: string
-  setName: (name: string) => void
+interface PetStore {
+  pet: Pet | null
+  feed: () => void
+  play: () => void
+  rest: () => void
+  tick: () => void
+  generatePet: () => void
 }
 
-export const usePetStore = create<PetState>((set) => ({
-  name: '',
-  setName: (name) => set({ name }),
+export const usePetStore = create<PetStore>(() => ({
+  pet: null,
+  feed: () => {},
+  play: () => {},
+  rest: () => {},
+  tick: () => {},
+  generatePet: () => {},
 }))

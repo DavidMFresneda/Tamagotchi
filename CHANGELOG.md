@@ -4,6 +4,23 @@ All notable changes to this project are documented here, one entry per working s
 
 ---
 
+## [2026-04-22] - Phase 2 complete: Domain types and Zustand store skeleton
+
+- `src/types/index.ts` — added `Stat` interface; `Pet` now uses `Stat` objects for all three stats
+- `src/store/usePetStore.ts` — replaced name-only store with full `PetStore` interface; `pet: null` initial state; five no-op action stubs (`feed`, `play`, `rest`, `tick`, `generatePet`)
+- `src/types/__tests__/index.test.ts` — updated type-shape contracts for `Stat` and upgraded `Pet`
+- `src/store/__tests__/usePetStore.test.ts` — replaced name tests with null-init and stub-callable assertions
+- `specs/roadmap.md` — Phase 2 marked as completed
+
+---
+
+## [2026-04-22] - Phase 1 complete: DB & persistence foundation merged
+
+- Phase 1 merged to `main` — SQLite save/load cycle fully working via sql.js + localStorage
+- `specs/roadmap.md` — Phase 1 marked as completed
+
+---
+
 ## [2026-04-21] - Unit testing infrastructure and auto-run hook
 
 - Installed Vitest + `@vitest/coverage-v8`, `jsdom`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`

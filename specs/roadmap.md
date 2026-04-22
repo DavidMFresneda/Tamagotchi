@@ -6,27 +6,27 @@ The persistence foundation comes first so that every subsequent phase can write 
 
 ---
 
-## Phase 1 — DB & persistence foundation
+## Phase 1 — DB & persistence foundation ✅
 
 **Delivers:** A working save/load cycle for the SQLite database, proven with a console smoke test. No UI.
 
-- Implement `src/db/database.ts`: initialise sql.js, load existing DB from `localStorage` on start, create schema on first boot.
-- Implement `src/db/schema.ts`: `CREATE TABLE IF NOT EXISTS pets (...)` with all pet fields.
-- Implement `saveDb()`: export DB as `Uint8Array`, base64-encode, write to `localStorage["tamagotchi_db"]`.
-- Smoke test in `main.tsx`: insert a row, call `saveDb()`, reload, verify the row is still there.
+- [x] Implement `src/db/database.ts`: initialise sql.js, load existing DB from `localStorage` on start, create schema on first boot.
+- [x] Implement `src/db/schema.ts`: `CREATE TABLE IF NOT EXISTS pets (...)` with all pet fields.
+- [x] Implement `saveDb()`: export DB as `Uint8Array`, base64-encode, write to `localStorage["tamagotchi_db"]`.
+- [x] Smoke test in `main.tsx`: insert a row, call `saveDb()`, reload, verify the row is still there.
 
 ---
 
-## Phase 2 — Domain types and Zustand store skeleton
+## Phase 2 — Domain types and Zustand store skeleton ✅
 
 **Delivers:** A fully typed store that compiles cleanly. No UI, no persistence wired yet.
 
-- Finalise `src/types/index.ts`:
+- [x] Finalise `src/types/index.ts`:
   - `Stat { value: number; max: number; isSpecial: boolean }` — a stat carries its own ceiling (100 normal, 200 special).
   - `Pet { name: string; hunger: Stat; happiness: Stat; energy: Stat; state: PetState }`.
   - `PetState` (`normal | sick | evolved`).
-- Build `src/store/usePetStore.ts`: initial state, typed action stubs (`feed`, `play`, `rest`, `tick`, `generatePet`).
-- Verify with `npm run build`.
+- [x] Build `src/store/usePetStore.ts`: initial state `pet: null`, typed action stubs (`feed`, `play`, `rest`, `tick`, `generatePet`) as silent no-ops.
+- [x] Verify with `npm run build`.
 
 ---
 
