@@ -4,8 +4,13 @@ import { PET_NAMES } from '../data/petNames'
 import { getDatabase, saveDb } from '../db/database'
 import { DECAY, REPLENISH, SIDE_EFFECT } from '../config'
 
+type CareAction = 'feed' | 'play' | 'rest'
+
 interface PetStore {
   pet: Pet | null
+  evolutionStreak: number
+  reactionMessage: string | null
+  actionSequence: CareAction[]
   feed: () => void
   play: () => void
   rest: () => void
@@ -13,17 +18,57 @@ interface PetStore {
   generatePet: () => void
 }
 
+const EVOLVE_THRESHOLD = 0.8
+const EVOLVE_TICKS = 3
+const EASTER_EGG_SEQUENCE: CareAction[] = ['feed', 'play', 'rest']
+
+const REACTIONS: Record<CareAction, string> = {
+  feed: 'Yum! That was delicious!',
+  play: 'Whee! Lets play again!',
+  rest: 'Zzz... feeling better now.',
+}
+
+const EASTER_EGG_REACTION = 'Secret combo unlocked! Pixel power activated!'
+
 function rollStat(): Stat {
   const isSpecial = Math.random() < 0.1
   const max = isSpecial ? 200 : 100
   return { value: max, max, isSpecial }
 }
 
+function evaluateState(pet: Pet, evolutionStreak: number, source: 'tick' | 'action') {
+  const hasZeroStat = pet.hunger.value === 0 || pet.happiness.value === 0 || pet.energy.value === 0
+  if (hasZeroStat) {
+    return { nextState: 'sick' as const, nextStreak: 0 }
+  }
+
+  const allHealthy =
+    pet.hunger.value >= pet.hunger.max * EVOLVE_THRESHOLD
+    && pet.happiness.value >= pet.happiness.max * EVOLVE_THRESHOLD
+    && pet.energy.value >= pet.energy.max * EVOLVE_THRESHOLD
+
+  if (!allHealthy) {
+    return { nextState: 'normal' as const, nextStreak: 0 }
+  }
+
+  const nextStreak = source === 'tick' ? evolutionStreak + 1 : evolutionStreak
+  if (nextStreak >= EVOLVE_TICKS) {
+    return { nextState: 'evolved' as const, nextStreak }
+  }
+
+  return { nextState: 'normal' as const, nextStreak }
+}
+
+function nextActionSequence(currentSequence: CareAction[], action: CareAction): CareAction[] {
+  const updated = [...currentSequence, action].slice(-EASTER_EGG_SEQUENCE.length)
+  return updated
+}
+
 function persistStats(pet: Pet): void {
   getDatabase().then(db => {
     db.run(
-      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
-      [pet.hunger.value, pet.happiness.value, pet.energy.value],
+      'UPDATE pets SET hunger=?, happiness=?, energy=?, state=? WHERE 1',
+      [pet.hunger.value, pet.happiness.value, pet.energy.value, pet.state],
     )
     saveDb()
   })
@@ -31,11 +76,14 @@ function persistStats(pet: Pet): void {
 
 export const usePetStore = create<PetStore>((set, get) => ({
   pet: null,
+  evolutionStreak: 0,
+  reactionMessage: null,
+  actionSequence: [],
   feed: () => {
-    const { pet } = get()
+    const { pet, evolutionStreak, actionSequence } = get()
     if (!pet) return
 
-    const updated: Pet = {
+    const updatedStats: Pet = {
       ...pet,
       hunger: {
         ...pet.hunger,
@@ -47,14 +95,24 @@ export const usePetStore = create<PetStore>((set, get) => ({
       },
     }
 
-    set({ pet: updated })
+    const evaluation = evaluateState(updatedStats, evolutionStreak, 'action')
+    const updated: Pet = { ...updatedStats, state: evaluation.nextState }
+    const sequence = nextActionSequence(actionSequence, 'feed')
+    const isEasterEgg = sequence.join('|') === EASTER_EGG_SEQUENCE.join('|')
+
+    set({
+      pet: updated,
+      evolutionStreak: evaluation.nextStreak,
+      actionSequence: sequence,
+      reactionMessage: isEasterEgg ? EASTER_EGG_REACTION : REACTIONS.feed,
+    })
     persistStats(updated)
   },
   play: () => {
-    const { pet } = get()
+    const { pet, evolutionStreak, actionSequence } = get()
     if (!pet) return
 
-    const updated: Pet = {
+    const updatedStats: Pet = {
       ...pet,
       happiness: {
         ...pet.happiness,
@@ -66,14 +124,24 @@ export const usePetStore = create<PetStore>((set, get) => ({
       },
     }
 
-    set({ pet: updated })
+    const evaluation = evaluateState(updatedStats, evolutionStreak, 'action')
+    const updated: Pet = { ...updatedStats, state: evaluation.nextState }
+    const sequence = nextActionSequence(actionSequence, 'play')
+    const isEasterEgg = sequence.join('|') === EASTER_EGG_SEQUENCE.join('|')
+
+    set({
+      pet: updated,
+      evolutionStreak: evaluation.nextStreak,
+      actionSequence: sequence,
+      reactionMessage: isEasterEgg ? EASTER_EGG_REACTION : REACTIONS.play,
+    })
     persistStats(updated)
   },
   rest: () => {
-    const { pet } = get()
+    const { pet, evolutionStreak, actionSequence } = get()
     if (!pet) return
 
-    const updated: Pet = {
+    const updatedStats: Pet = {
       ...pet,
       happiness: {
         ...pet.happiness,
@@ -85,21 +153,39 @@ export const usePetStore = create<PetStore>((set, get) => ({
       },
     }
 
-    set({ pet: updated })
+    const evaluation = evaluateState(updatedStats, evolutionStreak, 'action')
+    const updated: Pet = { ...updatedStats, state: evaluation.nextState }
+    const sequence = nextActionSequence(actionSequence, 'rest')
+    const isEasterEgg = sequence.join('|') === EASTER_EGG_SEQUENCE.join('|')
+
+    set({
+      pet: updated,
+      evolutionStreak: evaluation.nextStreak,
+      actionSequence: sequence,
+      reactionMessage: isEasterEgg ? EASTER_EGG_REACTION : REACTIONS.rest,
+    })
     persistStats(updated)
   },
 
   tick: () => {
-    const { pet } = get()
+    const { pet, evolutionStreak } = get()
     if (!pet) return
 
-    const updated: Pet = {
+    const updatedStats: Pet = {
       ...pet,
       hunger:    { ...pet.hunger,    value: Math.max(0, pet.hunger.value    - DECAY.hunger)    },
       happiness: { ...pet.happiness, value: Math.max(0, pet.happiness.value - DECAY.happiness) },
       energy:    { ...pet.energy,    value: Math.max(0, pet.energy.value    - DECAY.energy)    },
     }
-    set({ pet: updated })
+
+    const evaluation = evaluateState(updatedStats, evolutionStreak, 'tick')
+    const updated: Pet = { ...updatedStats, state: evaluation.nextState }
+
+    set({
+      pet: updated,
+      evolutionStreak: evaluation.nextStreak,
+      reactionMessage: null,
+    })
     persistStats(updated)
   },
 
@@ -112,7 +198,7 @@ export const usePetStore = create<PetStore>((set, get) => ({
       energy:    rollStat(),
       state: 'normal',
     }
-    set({ pet })
+    set({ pet, evolutionStreak: 0, reactionMessage: null, actionSequence: [] })
 
     getDatabase().then(db => {
       db.run(

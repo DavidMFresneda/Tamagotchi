@@ -66,21 +66,21 @@ The persistence foundation comes first so that every subsequent phase can write 
 
 ---
 
-## Phase 6 — Care, state system, visual feedback, and polish (in progress)
+## Phase 6 — Care, state system, visual feedback, and polish ✅
 
 **Delivers:** Complete gameplay loop for the remaining scope: care actions, state transitions, state-based visuals, and personality polish.
 
 - [x] Implement `feed()`, `play()`, `rest()` in the store: add stat points, clamp to each stat's own `max` (100 or 200).
 - [x] Add an `<ActionBar>` component with three buttons wired to the store actions.
 - [x] Call `saveDb()` after each action.
-- [ ] After every `tick()` and care action, evaluate state:
+- [x] After every `tick()` and care action, evaluate state:
   - Any stat at 0 -> `sick`.
   - All stats >= 80% of their `max` for a sustained period -> `evolved`.
   - Otherwise -> `normal`.
   - Recovery: from `sick` back to `normal` when all stats > 0.
-- [ ] Persist the current state with each `saveDb()` call.
-- [ ] `<PetDisplay>` renders a different class, color, or icon per `PetState`.
-- [ ] No full animation required, but a clear visual difference is required.
-- [ ] Add reaction messages triggered by care actions (e.g., "Yum!" on feed).
-- [ ] Add at least one easter egg (e.g., hidden reaction after a specific action sequence).
-- [ ] Light CSS polish: smooth stat bar transitions and readable layout.
+- [x] Persist the current state with each `saveDb()` call.
+- [x] `<PetDisplay>` renders a different class, color, or icon per `PetState`.
+- [x] No full animation required, but a clear visual difference is required.
+- [x] Add reaction messages triggered by care actions (e.g., "Yum!" on feed).
+- [x] Add at least one easter egg (e.g., hidden reaction after a specific action sequence).
+- [x] Light CSS polish: smooth stat bar transitions and readable layout.

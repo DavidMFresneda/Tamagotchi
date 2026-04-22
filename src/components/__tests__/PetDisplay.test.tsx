@@ -12,7 +12,7 @@ const mockPet: Pet = {
 }
 
 beforeEach(() => {
-  usePetStore.setState({ pet: null })
+  usePetStore.setState({ pet: null, reactionMessage: null })
 })
 
 describe('<PetDisplay> — with pet', () => {
@@ -35,6 +35,28 @@ describe('<PetDisplay> — with pet', () => {
   it('marks the special stat with a star', () => {
     render(<PetDisplay />)
     expect(screen.getByText('★')).toBeInTheDocument()
+  })
+
+  it('shows current state badge', () => {
+    render(<PetDisplay />)
+    expect(screen.getByText(/state: normal/i)).toBeInTheDocument()
+  })
+
+  it('applies evolved visual class', () => {
+    usePetStore.setState({
+      pet: { ...mockPet, state: 'evolved' },
+    })
+    const { container } = render(<PetDisplay />)
+    expect(container.firstChild).toHaveClass('pet-state-evolved')
+  })
+
+  it('renders reaction message when available', () => {
+    usePetStore.setState({
+      pet: mockPet,
+      reactionMessage: 'Yum! That was delicious!',
+    })
+    render(<PetDisplay />)
+    expect(screen.getByText(/yum! that was delicious!/i)).toBeInTheDocument()
   })
 })
 

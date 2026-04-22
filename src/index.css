@@ -43,6 +43,43 @@ h2 {
   gap: 0.75rem;
   width: 100%;
   max-width: 360px;
+  border: 2px solid #3f3f5b;
+  padding: 1rem 0.85rem;
+  box-sizing: border-box;
+  background: #23243c;
+}
+
+.pet-state-normal {
+  border-color: #3f3f5b;
+}
+
+.pet-state-sick {
+  border-color: #b33a3a;
+  background: #2f1e28;
+}
+
+.pet-state-evolved {
+  border-color: #ffd700;
+  background: #2b2f20;
+}
+
+.pet-state-badge {
+  margin: -0.25rem 0 0.35rem;
+  font-size: 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.reaction-message {
+  margin: 0.8rem 0 0;
+  width: 100%;
+  font-size: 0.45rem;
+  line-height: 1.7;
+  text-align: center;
+  background: #111;
+  border: 2px solid #f8f8f8;
+  padding: 0.55rem;
+  box-sizing: border-box;
 }
 
 /* StatBar */
@@ -74,7 +111,7 @@ h2 {
 .stat-bar-fill {
   height: 100%;
   background: #4caf50;
-  transition: none;
+  transition: width 240ms steps(12, end);
 }
 
 .stat-bar-fill.special {

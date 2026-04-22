@@ -8,18 +8,23 @@ import { PET_NAMES } from '../../data/petNames'
 import { getDatabase, saveDb } from '../../db/database'
 import type { Pet } from '../../types'
 
-function makePet(hunger = 50, happiness = 50, energy = 50): Pet {
+function makePet(hunger = 50, happiness = 50, energy = 50, state: Pet['state'] = 'normal'): Pet {
   return {
     name: 'Testi',
     hunger:    { value: hunger,    max: 100, isSpecial: false },
     happiness: { value: happiness, max: 100, isSpecial: false },
     energy:    { value: energy,    max: 100, isSpecial: false },
-    state: 'normal',
+    state,
   }
 }
 
 beforeEach(() => {
-  usePetStore.setState({ pet: null })
+  usePetStore.setState({
+    pet: null,
+    evolutionStreak: 0,
+    reactionMessage: null,
+    actionSequence: [],
+  })
   vi.clearAllMocks()
 })
 
@@ -46,8 +51,8 @@ describe('usePetStore — care actions', () => {
     await Promise.resolve()
     const db = await getDatabase()
     expect(db.run).toHaveBeenCalledWith(
-      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
-      [70, 55, 50],
+      'UPDATE pets SET hunger=?, happiness=?, energy=?, state=? WHERE 1',
+      [70, 55, 50, 'normal'],
     )
     expect(saveDb).toHaveBeenCalled()
   })
@@ -64,8 +69,8 @@ describe('usePetStore — care actions', () => {
     await Promise.resolve()
     const db = await getDatabase()
     expect(db.run).toHaveBeenCalledWith(
-      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
-      [50, 70, 45],
+      'UPDATE pets SET hunger=?, happiness=?, energy=?, state=? WHERE 1',
+      [50, 70, 45, 'normal'],
     )
     expect(saveDb).toHaveBeenCalled()
   })
@@ -82,8 +87,8 @@ describe('usePetStore — care actions', () => {
     await Promise.resolve()
     const db = await getDatabase()
     expect(db.run).toHaveBeenCalledWith(
-      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
-      [50, 55, 70],
+      'UPDATE pets SET hunger=?, happiness=?, energy=?, state=? WHERE 1',
+      [50, 55, 70, 'normal'],
     )
     expect(saveDb).toHaveBeenCalled()
   })
@@ -116,6 +121,16 @@ describe('usePetStore — care actions', () => {
     expect(getDatabase).not.toHaveBeenCalled()
     expect(saveDb).not.toHaveBeenCalled()
   })
+
+  it('triggers the easter egg reaction on feed -> play -> rest', () => {
+    usePetStore.setState({ pet: makePet(90, 90, 90) })
+
+    usePetStore.getState().feed()
+    usePetStore.getState().play()
+    usePetStore.getState().rest()
+
+    expect(usePetStore.getState().reactionMessage).toBe('Secret combo unlocked! Pixel power activated!')
+  })
 })
 
 describe('usePetStore — tick()', () => {
@@ -137,6 +152,36 @@ describe('usePetStore — tick()', () => {
     usePetStore.setState({ pet: makePet(3, 50, 50) })
     usePetStore.getState().tick()
     expect(usePetStore.getState().pet!.hunger.value).toBe(0)
+  })
+
+  it('sets state to sick when any stat reaches 0', () => {
+    usePetStore.setState({ pet: makePet(1, 50, 50) })
+    usePetStore.getState().tick()
+    expect(usePetStore.getState().pet!.state).toBe('sick')
+    expect(usePetStore.getState().evolutionStreak).toBe(0)
+  })
+
+  it('evolves after 3 consecutive healthy ticks', () => {
+    usePetStore.setState({ pet: makePet(100, 100, 100), evolutionStreak: 0 })
+
+    usePetStore.getState().tick()
+    expect(usePetStore.getState().pet!.state).toBe('normal')
+    expect(usePetStore.getState().evolutionStreak).toBe(1)
+
+    usePetStore.getState().tick()
+    expect(usePetStore.getState().pet!.state).toBe('normal')
+    expect(usePetStore.getState().evolutionStreak).toBe(2)
+
+    usePetStore.getState().tick()
+    expect(usePetStore.getState().pet!.state).toBe('evolved')
+    expect(usePetStore.getState().evolutionStreak).toBe(3)
+  })
+
+  it('resets evolution streak when healthy threshold breaks', () => {
+    usePetStore.setState({ pet: makePet(79, 100, 100), evolutionStreak: 2 })
+    usePetStore.getState().tick()
+    expect(usePetStore.getState().pet!.state).toBe('normal')
+    expect(usePetStore.getState().evolutionStreak).toBe(0)
   })
 
   it('clamps all stats at 0 simultaneously', () => {
@@ -172,6 +217,37 @@ describe('usePetStore — tick()', () => {
     expect(hunger.value).toBe(195)
     expect(happiness.value).toBe(196)
     expect(energy.value).toBe(197)
+  })
+
+  it('persists state together with stats', async () => {
+    usePetStore.setState({ pet: makePet(1, 50, 50) })
+    usePetStore.getState().tick()
+
+    await Promise.resolve()
+    const db = await getDatabase()
+    expect(db.run).toHaveBeenCalledWith(
+      'UPDATE pets SET hunger=?, happiness=?, energy=?, state=? WHERE 1',
+      [0, 46, 47, 'sick'],
+    )
+    expect(saveDb).toHaveBeenCalled()
+  })
+})
+
+describe('usePetStore — state recovery and action rules', () => {
+  it('recovers from sick to normal when all stats are above 0', () => {
+    usePetStore.setState({
+      pet: makePet(0, 50, 50, 'sick'),
+      evolutionStreak: 0,
+    })
+
+    usePetStore.getState().feed()
+    expect(usePetStore.getState().pet!.state).toBe('normal')
+  })
+
+  it('care action does not increase evolution streak by itself', () => {
+    usePetStore.setState({ pet: makePet(90, 90, 90), evolutionStreak: 2 })
+    usePetStore.getState().feed()
+    expect(usePetStore.getState().evolutionStreak).toBe(2)
   })
 })
 
