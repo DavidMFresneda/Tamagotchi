@@ -5,17 +5,20 @@ import { getDatabase, saveDb } from '../db/database'
 import { DECAY, REPLENISH, SIDE_EFFECT } from '../config'
 
 type CareAction = 'feed' | 'play' | 'rest'
+type AnimationState = 'idle' | 'eating' | 'playing' | 'sleeping'
 
 interface PetStore {
   pet: Pet | null
   evolutionStreak: number
   reactionMessage: string | null
   actionSequence: CareAction[]
+  animationState: AnimationState
   feed: () => void
   play: () => void
   rest: () => void
   tick: () => void
   generatePet: () => void
+  setAnimationState: (state: AnimationState) => void
 }
 
 const EVOLVE_THRESHOLD = 0.8
@@ -79,9 +82,20 @@ export const usePetStore = create<PetStore>((set, get) => ({
   evolutionStreak: 0,
   reactionMessage: null,
   actionSequence: [],
+  animationState: 'idle',
+  setAnimationState: (state: AnimationState) => {
+    set({ animationState: state })
+    if (state !== 'idle') {
+      setTimeout(() => {
+        set({ animationState: 'idle' })
+      }, 1000)
+    }
+  },
   feed: () => {
     const { pet, evolutionStreak, actionSequence } = get()
     if (!pet) return
+
+    get().setAnimationState('eating')
 
     const updatedStats: Pet = {
       ...pet,
@@ -112,6 +126,8 @@ export const usePetStore = create<PetStore>((set, get) => ({
     const { pet, evolutionStreak, actionSequence } = get()
     if (!pet) return
 
+    get().setAnimationState('playing')
+
     const updatedStats: Pet = {
       ...pet,
       happiness: {
@@ -140,6 +156,8 @@ export const usePetStore = create<PetStore>((set, get) => ({
   rest: () => {
     const { pet, evolutionStreak, actionSequence } = get()
     if (!pet) return
+
+    get().setAnimationState('sleeping')
 
     const updatedStats: Pet = {
       ...pet,
@@ -170,6 +188,8 @@ export const usePetStore = create<PetStore>((set, get) => ({
   tick: () => {
     const { pet, evolutionStreak } = get()
     if (!pet) return
+
+    set({ animationState: 'idle' })
 
     const updatedStats: Pet = {
       ...pet,
