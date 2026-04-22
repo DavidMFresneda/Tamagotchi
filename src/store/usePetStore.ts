@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { Pet, Stat } from '../types'
 import { PET_NAMES } from '../data/petNames'
 import { getDatabase, saveDb } from '../db/database'
-import { DECAY } from '../config'
+import { DECAY, REPLENISH, SIDE_EFFECT } from '../config'
 
 interface PetStore {
   pet: Pet | null
@@ -19,11 +19,75 @@ function rollStat(): Stat {
   return { value: max, max, isSpecial }
 }
 
+function persistStats(pet: Pet): void {
+  getDatabase().then(db => {
+    db.run(
+      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
+      [pet.hunger.value, pet.happiness.value, pet.energy.value],
+    )
+    saveDb()
+  })
+}
+
 export const usePetStore = create<PetStore>((set, get) => ({
   pet: null,
-  feed: () => {},
-  play: () => {},
-  rest: () => {},
+  feed: () => {
+    const { pet } = get()
+    if (!pet) return
+
+    const updated: Pet = {
+      ...pet,
+      hunger: {
+        ...pet.hunger,
+        value: Math.min(pet.hunger.max, pet.hunger.value + REPLENISH),
+      },
+      happiness: {
+        ...pet.happiness,
+        value: Math.min(pet.happiness.max, pet.happiness.value + SIDE_EFFECT),
+      },
+    }
+
+    set({ pet: updated })
+    persistStats(updated)
+  },
+  play: () => {
+    const { pet } = get()
+    if (!pet) return
+
+    const updated: Pet = {
+      ...pet,
+      happiness: {
+        ...pet.happiness,
+        value: Math.min(pet.happiness.max, pet.happiness.value + REPLENISH),
+      },
+      energy: {
+        ...pet.energy,
+        value: Math.max(0, pet.energy.value - SIDE_EFFECT),
+      },
+    }
+
+    set({ pet: updated })
+    persistStats(updated)
+  },
+  rest: () => {
+    const { pet } = get()
+    if (!pet) return
+
+    const updated: Pet = {
+      ...pet,
+      happiness: {
+        ...pet.happiness,
+        value: Math.min(pet.happiness.max, pet.happiness.value + SIDE_EFFECT),
+      },
+      energy: {
+        ...pet.energy,
+        value: Math.min(pet.energy.max, pet.energy.value + REPLENISH),
+      },
+    }
+
+    set({ pet: updated })
+    persistStats(updated)
+  },
 
   tick: () => {
     const { pet } = get()
@@ -36,14 +100,7 @@ export const usePetStore = create<PetStore>((set, get) => ({
       energy:    { ...pet.energy,    value: Math.max(0, pet.energy.value    - DECAY.energy)    },
     }
     set({ pet: updated })
-
-    getDatabase().then(db => {
-      db.run(
-        'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
-        [updated.hunger.value, updated.happiness.value, updated.energy.value],
-      )
-      saveDb()
-    })
+    persistStats(updated)
   },
 
   generatePet: () => {

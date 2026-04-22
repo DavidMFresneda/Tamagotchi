@@ -5,6 +5,7 @@ vi.mock('../../db/database', () => ({
 
 import { usePetStore } from '../usePetStore'
 import { PET_NAMES } from '../../data/petNames'
+import { getDatabase, saveDb } from '../../db/database'
 import type { Pet } from '../../types'
 
 function makePet(hunger = 50, happiness = 50, energy = 50): Pet {
@@ -22,23 +23,98 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
+afterEach(async () => {
+  await Promise.resolve()
+})
+
 describe('usePetStore — initial state', () => {
   it('starts with pet as null', () => {
     expect(usePetStore.getState().pet).toBeNull()
   })
 })
 
-describe('usePetStore — action stubs', () => {
-  it('feed is callable without throwing', () => {
+describe('usePetStore — care actions', () => {
+  it('feed() raises hunger by 20 and happiness by 5', async () => {
+    usePetStore.setState({ pet: makePet(50, 50, 50) })
+    usePetStore.getState().feed()
+
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(70)
+    expect(happiness.value).toBe(55)
+    expect(energy.value).toBe(50)
+
+    await Promise.resolve()
+    const db = await getDatabase()
+    expect(db.run).toHaveBeenCalledWith(
+      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
+      [70, 55, 50],
+    )
+    expect(saveDb).toHaveBeenCalled()
+  })
+
+  it('play() raises happiness by 20 and lowers energy by 5', async () => {
+    usePetStore.setState({ pet: makePet(50, 50, 50) })
+    usePetStore.getState().play()
+
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(50)
+    expect(happiness.value).toBe(70)
+    expect(energy.value).toBe(45)
+
+    await Promise.resolve()
+    const db = await getDatabase()
+    expect(db.run).toHaveBeenCalledWith(
+      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
+      [50, 70, 45],
+    )
+    expect(saveDb).toHaveBeenCalled()
+  })
+
+  it('rest() raises energy by 20 and happiness by 5', async () => {
+    usePetStore.setState({ pet: makePet(50, 50, 50) })
+    usePetStore.getState().rest()
+
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(50)
+    expect(happiness.value).toBe(55)
+    expect(energy.value).toBe(70)
+
+    await Promise.resolve()
+    const db = await getDatabase()
+    expect(db.run).toHaveBeenCalledWith(
+      'UPDATE pets SET hunger=?, happiness=?, energy=? WHERE 1',
+      [50, 55, 70],
+    )
+    expect(saveDb).toHaveBeenCalled()
+  })
+
+  it('clamps feed and rest increments to each stat max', () => {
+    usePetStore.setState({ pet: makePet(95, 98, 96) })
+    usePetStore.getState().feed()
+    usePetStore.getState().rest()
+
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(100)
+    expect(happiness.value).toBe(100)
+    expect(energy.value).toBe(100)
+  })
+
+  it('clamps play energy decrement at 0', () => {
+    usePetStore.setState({ pet: makePet(50, 50, 2) })
+    usePetStore.getState().play()
+    expect(usePetStore.getState().pet!.energy.value).toBe(0)
+  })
+
+  it('all actions are no-ops when pet is null', () => {
+    usePetStore.setState({ pet: null })
+
     expect(() => usePetStore.getState().feed()).not.toThrow()
-  })
-
-  it('play is callable without throwing', () => {
     expect(() => usePetStore.getState().play()).not.toThrow()
-  })
-
-  it('rest is callable without throwing', () => {
     expect(() => usePetStore.getState().rest()).not.toThrow()
+
+    expect(usePetStore.getState().pet).toBeNull()
+    expect(getDatabase).not.toHaveBeenCalled()
+    expect(saveDb).not.toHaveBeenCalled()
   })
 })
 

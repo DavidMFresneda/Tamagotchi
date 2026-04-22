@@ -5,3 +5,7 @@ export const DECAY = {
   happiness: 4,
   energy:    3,
 } as const
+
+export const REPLENISH = 20
+
+export const SIDE_EFFECT = 5

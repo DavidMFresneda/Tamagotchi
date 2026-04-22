@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { usePetStore } from './store/usePetStore'
 import { getDatabase } from './db/database'
 import { PetDisplay } from './components/PetDisplay'
+import { ActionBar } from './components/ActionBar'
 import { useGameTick } from './hooks/useGameTick'
 import type { Pet } from './types'
 
@@ -36,6 +37,7 @@ function App() {
     <div>
       <h1>Tamagotchi</h1>
       <PetDisplay />
+      <ActionBar />
     </div>
   )
 }
