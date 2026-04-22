@@ -66,42 +66,21 @@ The persistence foundation comes first so that every subsequent phase can write 
 
 ---
 
-## Phase 6 — Care actions
+## Phase 6 — Care, state system, visual feedback, and polish (in progress)
 
-**Delivers:** Feed, Play, and Rest buttons that replenish stats and persist the change.
+**Delivers:** Complete gameplay loop for the remaining scope: care actions, state transitions, state-based visuals, and personality polish.
 
-- Implement `feed()`, `play()`, `rest()` in the store: add stat points, clamp to the stat's own `max` (100 or 200).
-- Add a `<ActionBar>` component with three buttons wired to the store actions.
-- Call `saveDb()` after each action.
-
----
-
-## Phase 7 — State transitions
-
-**Delivers:** The pet transitions between Normal, Sick, and Evolved based on stat values.
-
-- After every `tick()` and care action, evaluate state:
-  - Any stat at 0 → `sick`.
-  - All stats ≥ 80% of their `max` for a sustained period → `evolved`.
-  - Otherwise → `normal`.
+- [x] Implement `feed()`, `play()`, `rest()` in the store: add stat points, clamp to each stat's own `max` (100 or 200).
+- [x] Add an `<ActionBar>` component with three buttons wired to the store actions.
+- [x] Call `saveDb()` after each action.
+- [ ] After every `tick()` and care action, evaluate state:
+  - Any stat at 0 -> `sick`.
+  - All stats >= 80% of their `max` for a sustained period -> `evolved`.
+  - Otherwise -> `normal`.
   - Recovery: from `sick` back to `normal` when all stats > 0.
-- Persist the current state with each `saveDb()` call.
-
----
-
-## Phase 8 — Visual states
-
-**Delivers:** The UI visually distinguishes Normal, Sick, and Evolved.
-
-- `<PetDisplay>` renders a different class, colour, or icon per `PetState`.
-- No full animation required — a clear visual difference is enough for this phase.
-
----
-
-## Phase 9 — Personality and polish
-
-**Delivers:** Small reactions and quirky messages that give the pet a distinct character.
-
-- Add reaction messages triggered by care actions (e.g., "Yum!" on feed).
-- Add at least one easter egg (e.g., a hidden reaction when a specific sequence of actions is performed).
-- Light CSS polish: smooth stat bar transitions, readable layout.
+- [ ] Persist the current state with each `saveDb()` call.
+- [ ] `<PetDisplay>` renders a different class, color, or icon per `PetState`.
+- [ ] No full animation required, but a clear visual difference is required.
+- [ ] Add reaction messages triggered by care actions (e.g., "Yum!" on feed).
+- [ ] Add at least one easter egg (e.g., hidden reaction after a specific action sequence).
+- [ ] Light CSS polish: smooth stat bar transitions and readable layout.
