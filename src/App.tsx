@@ -2,9 +2,12 @@ import { useEffect } from 'react'
 import { usePetStore } from './store/usePetStore'
 import { getDatabase } from './db/database'
 import { PetDisplay } from './components/PetDisplay'
+import { useGameTick } from './hooks/useGameTick'
 import type { Pet } from './types'
 
 function App() {
+  useGameTick()
+
   useEffect(() => {
     async function boot() {
       const db = await getDatabase()

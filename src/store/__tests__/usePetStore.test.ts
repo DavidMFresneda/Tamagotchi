@@ -5,6 +5,17 @@ vi.mock('../../db/database', () => ({
 
 import { usePetStore } from '../usePetStore'
 import { PET_NAMES } from '../../data/petNames'
+import type { Pet } from '../../types'
+
+function makePet(hunger = 50, happiness = 50, energy = 50): Pet {
+  return {
+    name: 'Testi',
+    hunger:    { value: hunger,    max: 100, isSpecial: false },
+    happiness: { value: happiness, max: 100, isSpecial: false },
+    energy:    { value: energy,    max: 100, isSpecial: false },
+    state: 'normal',
+  }
+}
 
 beforeEach(() => {
   usePetStore.setState({ pet: null })
@@ -29,9 +40,62 @@ describe('usePetStore — action stubs', () => {
   it('rest is callable without throwing', () => {
     expect(() => usePetStore.getState().rest()).not.toThrow()
   })
+})
 
-  it('tick is callable without throwing', () => {
+describe('usePetStore — tick()', () => {
+  it('is a no-op when pet is null', () => {
     expect(() => usePetStore.getState().tick()).not.toThrow()
+    expect(usePetStore.getState().pet).toBeNull()
+  })
+
+  it('decrements hunger by 5, happiness by 4, energy by 3', () => {
+    usePetStore.setState({ pet: makePet(50, 50, 50) })
+    usePetStore.getState().tick()
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(45)
+    expect(happiness.value).toBe(46)
+    expect(energy.value).toBe(47)
+  })
+
+  it('clamps hunger at 0 when value would go negative', () => {
+    usePetStore.setState({ pet: makePet(3, 50, 50) })
+    usePetStore.getState().tick()
+    expect(usePetStore.getState().pet!.hunger.value).toBe(0)
+  })
+
+  it('clamps all stats at 0 simultaneously', () => {
+    usePetStore.setState({ pet: makePet(0, 0, 0) })
+    usePetStore.getState().tick()
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(0)
+    expect(happiness.value).toBe(0)
+    expect(energy.value).toBe(0)
+  })
+
+  it('does not modify max or isSpecial', () => {
+    usePetStore.setState({ pet: makePet(50, 50, 50) })
+    usePetStore.getState().tick()
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.max).toBe(100)
+    expect(hunger.isSpecial).toBe(false)
+    expect(happiness.max).toBe(100)
+    expect(energy.max).toBe(100)
+  })
+
+  it('applies same numeric decay to a special stat (max 200)', () => {
+    const pet: Pet = {
+      name: 'Zap',
+      hunger:    { value: 200, max: 200, isSpecial: true },
+      happiness: { value: 200, max: 200, isSpecial: true },
+      energy:    { value: 200, max: 200, isSpecial: true },
+      state: 'normal',
+    }
+    usePetStore.setState({ pet })
+    usePetStore.getState().tick()
+    const { hunger, happiness, energy } = usePetStore.getState().pet!
+    expect(hunger.value).toBe(195)
+    expect(happiness.value).toBe(196)
+    expect(energy.value).toBe(197)
   })
 })
 

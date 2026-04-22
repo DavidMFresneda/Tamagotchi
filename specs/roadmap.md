@@ -54,14 +54,15 @@ The persistence foundation comes first so that every subsequent phase can write 
 
 ---
 
-## Phase 5 — Stat decay (the game tick)
+## Phase 5 — Stat decay (the game tick) ✅
 
 **Delivers:** Stats drop automatically over time while the app is open.
 
-- Implement `tick()` in the store: decrement hunger, happiness, energy by configured amounts, clamp to 0.
-- Start a `setInterval` in `App.tsx` (or a custom hook) that calls `tick()` every N seconds.
-- Call `saveDb()` after each tick.
-- Verify that stats reach 0 and stop there.
+- [x] Implement `tick()` in the store: hunger −5, happiness −4, energy −3 per tick, clamped to 0.
+- [x] `src/config.ts`: `TICK_INTERVAL_MS = 30_000` and `DECAY` constants.
+- [x] `useGameTick()` custom hook: `setInterval` every 30 s, clears on unmount.
+- [x] Call `saveDb()` after each tick via DB UPDATE.
+- [x] Stats reach 0 and stop there (Math.max clamp).
 
 ---
 

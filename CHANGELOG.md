@@ -4,6 +4,18 @@ All notable changes to this project are documented here, one entry per working s
 
 ---
 
+## [2026-04-22] - Phase 5 complete: Stat decay (game tick)
+
+- `src/config.ts` — `TICK_INTERVAL_MS = 30_000` and `DECAY = { hunger: 5, happiness: 4, energy: 3 }`
+- `src/store/usePetStore.ts` — `tick()` implemented: decrements stats by DECAY amounts, clamps to 0, persists via UPDATE + saveDb()
+- `src/hooks/useGameTick.ts` — custom hook: setInterval every 30 s, clearInterval on unmount
+- `src/App.tsx` — calls `useGameTick()`
+- `src/store/__tests__/usePetStore.test.ts` — tick() tests: amounts, clamping, null guard, special stats
+- `src/hooks/__tests__/useGameTick.test.ts` — interval start, cleanup, tick invocation
+- `specs/roadmap.md` — Phase 5 marked as completed
+
+---
+
 ## [2026-04-22] - Phase 4 complete: Random pet generation
 
 - `src/data/petNames.ts` — 20 quirky pixel-art pet names
